@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:squash/menu.dart';
-import 'package:squash/routes.dart';
-import 'package:squash/splashscreen.dart';
+import 'package:squash/Screens/menu.dart';
+import 'package:squash/Routes/routes.dart';
+import 'package:squash/Screens/splashscreen.dart';
 
 void main() {
   runApp(const Myapp());

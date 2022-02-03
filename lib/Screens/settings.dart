@@ -24,21 +24,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  getLang() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    lang = pref.getBool('lang')!;
-  }
-
   setData() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
-    pref.setBool('langseeting', lang);
+    pref.setBool('lang', lang);
+  }
+
+  setVibration() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setBool('vibration', y);
   }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    getLang();
+
     print(lang);
   }
 
@@ -112,6 +112,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         setState(() {
                           y = !y;
                         });
+                        setVibration();
                       },
                       icon: Icon(Icons.vibration),
                       iconSize: 50,

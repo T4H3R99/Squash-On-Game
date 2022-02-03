@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,14 +12,6 @@ class ScoreScreen extends StatefulWidget {
 
 class _ScoreScreenState extends State<ScoreScreen> {
   bool lang = false;
-  // getData() async {
-  //   SharedPreferences pref = await SharedPreferences.getInstance();
-  //   setState(() {
-  //     lang = pref.getBool('lang')!;
-  //   });
-
-  //   print(lang);
-  // }
 
   int score = 0;
   int bestScore = 0;
@@ -57,6 +50,9 @@ class _ScoreScreenState extends State<ScoreScreen> {
 
     getData();
   }
+
+  AudioPlayer audioPlayer = AudioPlayer();
+  AudioCache audioCache = AudioCache();
 
   @override
   Widget build(BuildContext context) {

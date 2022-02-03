@@ -12,15 +12,17 @@ class MenuScreen extends StatefulWidget {
 }
 
 class _MenuScreenState extends State<MenuScreen> {
-  AudioPlayer audioPlayer = AudioPlayer();
-
+  // AudioPlayer audioPlayer = AudioPlayer();
+  // AudioCache audioCache = AudioCache();
   //AudioPlayerState audioPlayerState = AudioPlayerState.PAUSED;
   void initState() {
     // TODO: implement initState
     super.initState();
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
-    audioplay();
+    //audioCache = AudioCache(fixedPlayer: audioPlayer);
+
+    //audioplay();
   }
 
   bool lang = false;
@@ -33,6 +35,7 @@ class _MenuScreenState extends State<MenuScreen> {
 
   putLang() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setBool('forsettings', lang);
   }
 
   var x = true;
@@ -40,9 +43,14 @@ class _MenuScreenState extends State<MenuScreen> {
   var z = true;
   //AudioCache audioPlayer = AudioCache();
   var play = true;
-  void audioplay() async {
-    //audio
-  }
+  // void audioplay() async {
+  //   //audio
+  //   await audioCache.loop('Menu.mp3');
+  // }
+
+  // void audioPause() async {
+  //   await audioPlayer.pause();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -135,6 +143,9 @@ class _MenuScreenState extends State<MenuScreen> {
                     ),
                   ),
                   onPressed: () {
+                    getLang();
+                    putLang();
+
                     Navigator.pushNamed(context, 'game');
                   },
                 ),
