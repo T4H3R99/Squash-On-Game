@@ -11,8 +11,6 @@ class ScoreScreen extends StatefulWidget {
 }
 
 class _ScoreScreenState extends State<ScoreScreen> {
-  bool lang = false;
-
   int score = 0;
   int bestScore = 0;
   int bestScoreever = 0;
@@ -35,24 +33,24 @@ class _ScoreScreenState extends State<ScoreScreen> {
     }
   }
 
-  getData() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
+  var lang2;
+  Future<bool> getlang() async {
+    SharedPreferences _pref = await SharedPreferences.getInstance();
     setState(() {
-      lang = pref.getBool('lang')!;
+      lang2 = _pref.getBool('language')!;
     });
+
+    return lang2;
   }
 
   @override
   void initState() {
     // TODO: implement initState
+    getlang();
     super.initState();
+
     getScore();
-
-    getData();
   }
-
-  AudioPlayer audioPlayer = AudioPlayer();
-  AudioCache audioCache = AudioCache();
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +70,7 @@ class _ScoreScreenState extends State<ScoreScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                lang ? ' СЧЁТ: $score' : 'SCORE :$score',
+                lang2 ? ' СЧЁТ: $score' : 'SCORE :$score',
                 style: const TextStyle(
                     fontSize: 40.0,
                     fontWeight: FontWeight.w700,
@@ -82,7 +80,7 @@ class _ScoreScreenState extends State<ScoreScreen> {
                 height: 10,
               ),
               Text(
-                lang
+                lang2
                     ? 'ЛУЧШИЙ СЧЁТ'
                     : 'BEST SCORE : ${whosBigger() == 1 ? bestScore : score}',
                 style: const TextStyle(

@@ -1,4 +1,4 @@
-import 'package:audioplayers/audioplayers.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
@@ -27,41 +27,36 @@ class _GamePlayState extends State<GamePlay> {
           _start--;
         });
       }
-      // if (_start == 0 && nbrRacket > 0) {
-      //   setState(() {
-      //     nbrRacket = nbrRacket - 1;
-      //   });
-      //   //wrongPlay();
-      // }
+      if (_start == 0 && nbrRacket > 0) {
+        setState(() {
+          nbrRacket = nbrRacket - 1;
+        });
+      }
+
+      if (_start == 0 && nbrRacket == 0) {
+        _timer.cancel();
+
+        Navigator.pushNamedAndRemoveUntil(
+            context, 'score', (Route<dynamic> route) => false);
+      }
     });
   }
 
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    _timer.cancel();
-    timergame();
-    super.dispose();
-  }
+  bool sound = true;
 
   void setScore() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     pref.setInt('score', score);
   }
 
-  bool? lang;
-  getLang() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    lang = pref.getBool('forsettings')!;
-  }
+  final player = AudioPlayer();
 
-  AudioPlayer audioPlayer = AudioPlayer();
-  AudioCache audioCache = AudioCache();
   @override
   void initState() {
     // TODO: implement initState
+
     super.initState();
-    timergame();
+    getVibration();
     generateRandomColumn();
 
     generateRandomRow();
@@ -69,16 +64,8 @@ class _GamePlayState extends State<GamePlay> {
     coordinateBall();
     liste();
 
-    getLang();
-    getVibration();
-
-    //audioCache = AudioCache(fixedPlayer: audioPlayer);
+    timergame();
   }
-
-  @override
-  // void audioPause() async {
-  //   await audioPlayer.pause();
-  // }
 
   Random rnd = new Random();
   int score = 0;
@@ -111,10 +98,6 @@ class _GamePlayState extends State<GamePlay> {
         randomcolumn3 = rnd.nextInt(4) + 1;
       });
     }
-
-    // print(randomcolumn1);
-    // print(randomcolumn2);
-    // print(randomcolumn3);
   }
 
   void generateRandomRow() {
@@ -151,22 +134,22 @@ class _GamePlayState extends State<GamePlay> {
         break;
       case 1:
         {
-          coordinate = [2, 1];
+          coordinate = [1, 2];
         }
         break;
       case 2:
         {
-          coordinate = [3, 1];
+          coordinate = [1, 3];
         }
         break;
       case 3:
         {
-          coordinate = [4, 1];
+          coordinate = [1, 4];
         }
         break;
       case 4:
         {
-          coordinate = [1, 2];
+          coordinate = [2, 1];
         }
         break;
       case 5:
@@ -176,22 +159,22 @@ class _GamePlayState extends State<GamePlay> {
         break;
       case 6:
         {
-          coordinate = [3, 2];
+          coordinate = [2, 3];
         }
         break;
       case 7:
         {
-          coordinate = [4, 2];
+          coordinate = [2, 4];
         }
         break;
       case 8:
         {
-          coordinate = [1, 3];
+          coordinate = [3, 1];
         }
         break;
       case 9:
         {
-          coordinate = [2, 3];
+          coordinate = [3, 2];
         }
         break;
       case 10:
@@ -201,7 +184,7 @@ class _GamePlayState extends State<GamePlay> {
         break;
       case 11:
         {
-          coordinate = [4, 3];
+          coordinate = [3, 4];
         }
         break;
       default:
@@ -210,12 +193,9 @@ class _GamePlayState extends State<GamePlay> {
         }
         break;
     }
-    //print(coordinate);
-    //print(coordinate[0]);
-
-    while ((coordinate[0] == randomcolumn1 && coordinate[1] == randomRow1) ||
-        (coordinate[0] == randomcolumn2 && coordinate[1] == randomRow2) ||
-        (coordinate[0] == randomcolumn3 && coordinate[1] == randomRow3)) {
+    while ((coordinate[0] == randomRow1 && coordinate[1] == randomcolumn1) ||
+        (coordinate[0] == randomRow2 && coordinate[1] == randomcolumn2) ||
+        (coordinate[0] == randomRow3 && coordinate[1] == randomcolumn3)) {
       generateRandomColumn();
     }
     setState(() {
@@ -225,46 +205,37 @@ class _GamePlayState extends State<GamePlay> {
     return newCoor;
   }
 
-  List<dynamic> liste() {
+  void liste() {
     L = [
-      [randomcolumn1, randomRow1],
-      [randomcolumn2, randomRow2],
-      [randomcolumn3, randomRow3],
+      [randomRow1, randomcolumn1],
+      [randomRow2, randomcolumn2],
+      [randomRow3, randomcolumn3],
       [newCoor[0], newCoor[1]],
     ];
+    print('before shuffle $L');
+    L.shuffle();
     print(L);
-    setState(() {
-      L.shuffle();
-    });
-    print(L);
-    return L;
   }
 
-  getVibration() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    setState(() {
-      vibration = pref.getBool('vibration');
-    });
-    print(vibration);
+  var vibrationGame;
+  Future<bool> getVibration() async {
+    SharedPreferences _pref = await SharedPreferences.getInstance();
+
+    vibrationGame = _pref.getBool('vibration')!;
+    return vibrationGame;
   }
 
-  // void correctPlay() async {
-  //   //audio
-  //   await audioCache.play('Correct.mp3', volume: 10.0);
-  // }
+  void wrongAnswer() async {
+    var song1 = player.setAsset('assets/Wrong.mp3');
+    player.setVolume(50.0);
+    player.play();
+  }
 
-  // void audioplay() async {
-  //   //audio
-  //   await audioCache.loop('Menu.mp3');
-  // }
-
-  // void wrongPlay() async {
-  //   //audio
-  //   await audioCache.play(
-  //     'Wrong.mp3',
-  //     volume: 10.0,
-  //   );
-  // }
+  void correctAnswer() async {
+    var song2 = player.setAsset('assets/Correct.mp3');
+    player.setVolume(50.0);
+    player.play();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -316,37 +287,42 @@ class _GamePlayState extends State<GamePlay> {
                             itemBuilder: (BuildContext context, int index) {
                               return GestureDetector(
                                 onTap: () async {
-                                  generateRandomColumn();
-                                  generateRandomRow();
-                                  generateIndexForBall();
-                                  coordinateBall();
-                                  liste();
                                   if (L[index][0] == newCoor[0] &&
                                       L[index][1] == newCoor[1]) {
+                                    correctAnswer();
                                     setState(() {
                                       score = score + 3;
                                       _start = 4;
                                     });
-                                    setState(() {});
-                                    //audioPlayer.pause();
-                                    //correctPlay();
-                                    //audioPlayer.resume();
+                                    generateRandomColumn();
+                                    generateRandomRow();
+                                    generateIndexForBall();
+                                    coordinateBall();
+                                    liste();
                                   } else {
-                                    //audioPlayer.pause();
-                                    //wrongPlay();
-                                    //audioPlayer.resume();
+                                    wrongAnswer();
                                     setState(() {
                                       nbrRacket = nbrRacket - 1;
                                       _start = 4;
                                     });
-                                    if (nbrRacket == 0) {
-                                      Navigator.pushNamed(context, 'score');
-                                      setScore();
+                                    if (vibrationGame == true) {
+                                      if (await Vibration.hasVibrator()) {
+                                        Vibration.vibrate(
+                                            duration: 200, amplitude: -1);
+                                      }
                                     }
-                                    if (await Vibration.hasVibrator() &&
-                                        vibration == true) {
-                                      Vibration.vibrate(
-                                          amplitude: -2, duration: 300);
+                                    generateRandomColumn();
+                                    generateRandomRow();
+                                    generateIndexForBall();
+                                    coordinateBall();
+                                    liste();
+                                    if (nbrRacket == 0) {
+                                      setScore();
+
+                                      Navigator.pushNamedAndRemoveUntil(
+                                          context,
+                                          'score',
+                                          (Route<dynamic> route) => false);
                                     }
                                   }
                                 },
@@ -358,8 +334,6 @@ class _GamePlayState extends State<GamePlay> {
                                       border: Border.all(color: Colors.black)),
                                   child: Center(
                                     child: Text(
-                                      //'${L[index]}/${L[L.length - index - 1]}',
-                                      // index.toString(),
                                       '${L[index][0]}/${L[index][1]}',
                                       style: const TextStyle(
                                           color: Colors.white, fontSize: 30),
@@ -378,8 +352,8 @@ class _GamePlayState extends State<GamePlay> {
                                 const SliverGridDelegateWithFixedCrossAxisCount(
                                     childAspectRatio: 2.5,
                                     crossAxisCount: 4,
-                                    crossAxisSpacing: 2.0,
-                                    mainAxisSpacing: 2.0),
+                                    crossAxisSpacing: 1.78,
+                                    mainAxisSpacing: 1.78),
                             itemBuilder: (BuildContext context, int index) {
                               return GestureDetector(
                                 onTap: () {},
@@ -428,9 +402,8 @@ class _GamePlayState extends State<GamePlay> {
             child: GridView.count(
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
-                crossAxisCount: 4,
-                crossAxisSpacing: 0.5,
-                childAspectRatio: 2.0,
+                crossAxisCount: 3,
+                childAspectRatio: 2.3,
                 children: List.generate(
                         nbrRacket, (index) => Image.asset('assets/asfe1.png'))
                     .toList()),

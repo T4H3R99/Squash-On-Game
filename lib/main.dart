@@ -31,7 +31,7 @@ class _MyappState extends State<Myapp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       routes: Routes.routes(),
-      initialRoute: Routes.menu,
+      initialRoute: Routes.splash,
     );
   }
 }

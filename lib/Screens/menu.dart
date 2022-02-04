@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:audioplayers/audioplayers.dart';
+
 //import 'package:audioplayers/audio_cache.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:just_audio/just_audio.dart';
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({Key? key}) : super(key: key);
@@ -20,37 +21,71 @@ class _MenuScreenState extends State<MenuScreen> {
     super.initState();
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
-    //audioCache = AudioCache(fixedPlayer: audioPlayer);
 
-    //audioplay();
+    getSound();
+    getVibration();
+    getLnaguage();
+    print('sound1 is $sound1');
+    print('vibration is $vibration1');
+    player.pause();
+    player.dispose();
   }
 
-  bool lang = false;
-  getLang() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
+  bool lang = true;
+  static bool _defaultSound = true;
+  static var sound1 = true;
+  static bool defaultVibration = true;
+  static bool vibration1 = true;
+  static bool lang1 = true;
+
+  Future<bool> getSound() async {
+    SharedPreferences _pref = await SharedPreferences.getInstance();
     setState(() {
-      lang = pref.getBool('lang')!;
+      sound1 = _pref.getBool('sound')!;
     });
+    print('sound from settings is $sound1');
+    return sound1;
   }
 
-  putLang() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    pref.setBool('forsettings', lang);
+  putSoundToSettings() async {
+    SharedPreferences _pref = await SharedPreferences.getInstance();
+    _pref.setBool('defaultsound', _defaultSound);
   }
 
-  var x = true;
-  var y = true;
-  var z = true;
-  //AudioCache audioPlayer = AudioCache();
-  var play = true;
-  // void audioplay() async {
-  //   //audio
-  //   await audioCache.loop('Menu.mp3');
-  // }
+  Future<bool> getVibration() async {
+    SharedPreferences _pref = await SharedPreferences.getInstance();
 
-  // void audioPause() async {
-  //   await audioPlayer.pause();
-  // }
+    vibration1 = _pref.getBool('vibration')!;
+    return vibration1;
+  }
+
+  putVibrationToSettings() async {
+    SharedPreferences _pref = await SharedPreferences.getInstance();
+    _pref.setBool('defaultvibration', vibration1);
+  }
+
+  Future<bool> getLnaguage() async {
+    SharedPreferences _pref = await SharedPreferences.getInstance();
+
+    lang1 = _pref.getBool('language')!;
+    return lang1;
+  }
+
+  putLanguageForSettings() async {
+    SharedPreferences _pref = await SharedPreferences.getInstance();
+    _pref.setBool('defaultlanguage', lang1);
+  }
+
+  AudioPlayer player = AudioPlayer();
+
+  song() async {
+    var song = await player.setAsset('assets/Menu.mp3');
+
+    player.play();
+    player.setVolume(60.0);
+
+    player.setLoopMode(LoopMode.one);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +111,9 @@ class _MenuScreenState extends State<MenuScreen> {
               child: Align(
                 alignment: Alignment.topLeft,
                 child: IconButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    await putSoundToSettings();
+                    await putVibrationToSettings();
                     Navigator.pushNamed(context, 'settings');
                   },
                   icon: Container(
@@ -84,7 +121,7 @@ class _MenuScreenState extends State<MenuScreen> {
                       decoration: BoxDecoration(
                           color: Colors.grey,
                           shape: BoxShape.rectangle,
-                          borderRadius: BorderRadius.circular(5.00)),
+                          borderRadius: BorderRadius.circular(2.00)),
                       child: Center(child: Icon(Icons.settings))),
                 ),
               ),
@@ -143,10 +180,8 @@ class _MenuScreenState extends State<MenuScreen> {
                     ),
                   ),
                   onPressed: () {
-                    getLang();
-                    putLang();
-
-                    Navigator.pushNamed(context, 'game');
+                    song();
+                    Navigator.pushReplacementNamed(context, 'game');
                   },
                 ),
               ),
