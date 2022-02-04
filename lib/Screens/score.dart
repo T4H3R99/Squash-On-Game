@@ -48,12 +48,15 @@ class _ScoreScreenState extends State<ScoreScreen> {
     return lang2;
   }
 
+  late SharedPreferences sharedPreferences;
+  bool? _testValue;
   @override
   void initState() {
     // TODO: implement initState
+    super.initState();
     print(lang2);
     getlang();
-    super.initState();
+
     print(lang2);
     getScore();
   }

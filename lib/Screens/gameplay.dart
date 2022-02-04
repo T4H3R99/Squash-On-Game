@@ -48,7 +48,15 @@ class _GamePlayState extends State<GamePlay> {
     });
   }
 
-  bool sound = true;
+  bool sound3 = true;
+  Future<bool> getSound() async {
+    SharedPreferences _pref = await SharedPreferences.getInstance();
+    setState(() {
+      sound3 = _pref.getBool('sound')!;
+    });
+    print('sound 3 is $sound3');
+    return sound3;
+  }
 
   void setScore() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
@@ -62,6 +70,7 @@ class _GamePlayState extends State<GamePlay> {
     // TODO: implement initState
 
     super.initState();
+    getSound();
     getVibration();
     generateRandomColumn();
 
@@ -72,12 +81,27 @@ class _GamePlayState extends State<GamePlay> {
 
     timergame();
     score = 0;
+    song();
+  }
+
+  stopsong() async {
+    var song = await player.setAsset('assets/Menu.mp3');
+    player.play();
+  }
+
+  song() async {
+    var song = await player.setAsset('assets/Menu.mp3');
+    if (sound3 == true) {
+      player.play();
+
+      player.setLoopMode(LoopMode.one);
+    }
   }
 
   Random rnd = new Random();
   static int score = 0;
   int nbrRacket = 3;
-  bool? vibration = false;
+  bool? vibration1 = false;
   late int randomcolumn1;
   late int randomcolumn2;
   late int randomcolumn3;
@@ -232,16 +256,25 @@ class _GamePlayState extends State<GamePlay> {
     return vibrationGame;
   }
 
+  final player2 = AudioPlayer();
   void wrongAnswer() {
-    var song1 = player.setAsset('assets/Wrong.mp3');
-    player.setVolume(130.0);
-    player.play();
+    var song1 = player2.setAsset('assets/Wrong.mp3');
+    player2.setVolume(130.0);
+    player2.play();
   }
 
+  final player3 = AudioPlayer();
   void correctAnswer() {
-    var song2 = player.setAsset('assets/Correct.mp3');
-    player.setVolume(130.0);
-    player.play();
+    var song3 = player3.setAsset('assets/Correct.mp3');
+    player3.setVolume(130.0);
+    player3.play();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    player.dispose();
   }
 
   @override
@@ -296,10 +329,10 @@ class _GamePlayState extends State<GamePlay> {
                                 onTap: () async {
                                   if (L[index][0] == newCoor[0] &&
                                       L[index][1] == newCoor[1]) {
-                                    if (sound == true) {
+                                    if (sound3 == true) {
+                                      player.pause();
                                       correctAnswer();
-                                    } else {
-                                      print('is it false ?');
+                                      player.play();
                                     }
 
                                     if (mounted) {
@@ -314,10 +347,10 @@ class _GamePlayState extends State<GamePlay> {
                                     coordinateBall();
                                     liste();
                                   } else {
-                                    if (sound == true) {
+                                    if (sound3 == true) {
+                                      player.pause();
                                       wrongAnswer();
-                                    } else {
-                                      print('is it false too ?');
+                                      player.play();
                                     }
 
                                     if (mounted) {

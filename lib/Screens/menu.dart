@@ -78,15 +78,6 @@ class _MenuScreenState extends State<MenuScreen> {
 
   AudioPlayer player = AudioPlayer();
 
-  song() async {
-    var song = await player.setAsset('assets/Menu.mp3');
-
-    player.play();
-    player.setVolume(60.0);
-
-    player.setLoopMode(LoopMode.one);
-  }
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -180,7 +171,6 @@ class _MenuScreenState extends State<MenuScreen> {
                     ),
                   ),
                   onPressed: () {
-                    song();
                     Navigator.pushReplacementNamed(context, 'game');
                   },
                 ),
