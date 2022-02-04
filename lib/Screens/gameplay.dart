@@ -19,23 +19,29 @@ class _GamePlayState extends State<GamePlay> {
   void timergame() {
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
       if (_start == 0) {
-        setState(() {
-          _start = 4;
-        });
+        if (mounted) {
+          setState(() {
+            _start = 4;
+          });
+        }
       } else {
-        setState(() {
-          _start--;
-        });
+        if (mounted) {
+          setState(() {
+            _start--;
+          });
+        }
       }
       if (_start == 0 && nbrRacket > 0) {
-        setState(() {
-          nbrRacket = nbrRacket - 1;
-        });
+        if (mounted) {
+          setState(() {
+            nbrRacket = nbrRacket - 1;
+          });
+        }
       }
 
       if (_start == 0 && nbrRacket == 0) {
         _timer.cancel();
-
+        setScore();
         Navigator.pushNamedAndRemoveUntil(
             context, 'score', (Route<dynamic> route) => false);
       }
@@ -65,10 +71,11 @@ class _GamePlayState extends State<GamePlay> {
     liste();
 
     timergame();
+    score = 0;
   }
 
   Random rnd = new Random();
-  int score = 0;
+  static int score = 0;
   int nbrRacket = 3;
   bool? vibration = false;
   late int randomcolumn1;
@@ -225,15 +232,15 @@ class _GamePlayState extends State<GamePlay> {
     return vibrationGame;
   }
 
-  void wrongAnswer() async {
+  void wrongAnswer() {
     var song1 = player.setAsset('assets/Wrong.mp3');
-    player.setVolume(50.0);
+    player.setVolume(130.0);
     player.play();
   }
 
-  void correctAnswer() async {
+  void correctAnswer() {
     var song2 = player.setAsset('assets/Correct.mp3');
-    player.setVolume(50.0);
+    player.setVolume(130.0);
     player.play();
   }
 
@@ -289,22 +296,36 @@ class _GamePlayState extends State<GamePlay> {
                                 onTap: () async {
                                   if (L[index][0] == newCoor[0] &&
                                       L[index][1] == newCoor[1]) {
-                                    correctAnswer();
-                                    setState(() {
-                                      score = score + 3;
-                                      _start = 4;
-                                    });
+                                    if (sound == true) {
+                                      correctAnswer();
+                                    } else {
+                                      print('is it false ?');
+                                    }
+
+                                    if (mounted) {
+                                      setState(() {
+                                        score = score + 3;
+                                        _start = 4;
+                                      });
+                                    }
                                     generateRandomColumn();
                                     generateRandomRow();
                                     generateIndexForBall();
                                     coordinateBall();
                                     liste();
                                   } else {
-                                    wrongAnswer();
-                                    setState(() {
-                                      nbrRacket = nbrRacket - 1;
-                                      _start = 4;
-                                    });
+                                    if (sound == true) {
+                                      wrongAnswer();
+                                    } else {
+                                      print('is it false too ?');
+                                    }
+
+                                    if (mounted) {
+                                      setState(() {
+                                        nbrRacket = nbrRacket - 1;
+                                        _start = 4;
+                                      });
+                                    }
                                     if (vibrationGame == true) {
                                       if (await Vibration.hasVibrator()) {
                                         Vibration.vibrate(

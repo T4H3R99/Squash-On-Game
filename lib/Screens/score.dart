@@ -11,34 +11,39 @@ class ScoreScreen extends StatefulWidget {
 }
 
 class _ScoreScreenState extends State<ScoreScreen> {
-  int score = 0;
-  int bestScore = 0;
-  int bestScoreever = 0;
-  getScore() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    setState(() {
-      score = pref.getInt('score')!;
-    });
-  }
+  static int score1 = 0;
+  static int bestScore = 0;
 
-  int whosBigger() {
-    if (score > bestScore) {
-      setState(() {
-        bestScore = score;
-        bestScoreever = bestScore;
-      });
-      return 1;
-    } else {
-      return 0;
+  void getScore() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+
+    score1 = pref.getInt('score')!;
+    print('score is $score1;');
+    if (score1 > bestScore) {
+      if (mounted) {
+        setState(() {
+          bestScore = score1;
+        });
+      }
     }
   }
 
-  var lang2;
+  void score() {
+    if (mounted) {
+      setState(() {
+        score1 = 0;
+      });
+    }
+  }
+
+  var lang2 = true;
   Future<bool> getlang() async {
     SharedPreferences _pref = await SharedPreferences.getInstance();
-    setState(() {
-      lang2 = _pref.getBool('language')!;
-    });
+    if (mounted) {
+      setState(() {
+        lang2 = _pref.getBool('language')!;
+      });
+    }
 
     return lang2;
   }
@@ -46,10 +51,18 @@ class _ScoreScreenState extends State<ScoreScreen> {
   @override
   void initState() {
     // TODO: implement initState
+    print(lang2);
     getlang();
     super.initState();
-
+    print(lang2);
     getScore();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    score();
   }
 
   @override
@@ -70,7 +83,7 @@ class _ScoreScreenState extends State<ScoreScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                lang2 ? ' СЧЁТ: $score' : 'SCORE :$score',
+                lang2 == true ? ' СЧЁТ: $score1' : 'SCORE :$score1',
                 style: const TextStyle(
                     fontSize: 40.0,
                     fontWeight: FontWeight.w700,
@@ -80,9 +93,7 @@ class _ScoreScreenState extends State<ScoreScreen> {
                 height: 10,
               ),
               Text(
-                lang2
-                    ? 'ЛУЧШИЙ СЧЁТ'
-                    : 'BEST SCORE : ${whosBigger() == 1 ? bestScore : score}',
+                lang2 ? 'ЛУЧШИЙ СЧЁТ : $bestScore' : 'BEST SCORE :  $bestScore',
                 style: const TextStyle(
                     fontSize: 40.0,
                     fontWeight: FontWeight.w700,
